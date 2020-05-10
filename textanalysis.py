@@ -20,12 +20,12 @@ def filter_characters(string):
 
 
 # Counts total number of times each single character is occurring in the text
-def count_s_occurrences(string):
-    char_dict = {}
-    length = 1
-    chunks = list(string)
-    char_dict = {**map(lambda ch: (ch,0), chunks)}
-    values = {**map(lambda key: (key,chunks.count(key)),char_dict.keys())}
+def count_occurrences(string: str, chunker: int = 1) -> dict:
+    n_chunks = len(string) # chunker
+    chunks = list(map(lambda i: string[chunker * i:][:chunker], range(n_chunks)))
+    print(chunks)
+    values = dict(list(map((lambda key: (key, chunks.count(key))), set(chunks))))
+    print(values)
     return values
 
 
@@ -63,9 +63,7 @@ def count_t_occurrences(string):
 def text_analysis():
     # Pulls the raw text from file and places it in an array
     raw_text = str(open(FILENAME, 'r').read())
-    clean_text = filter_characters(raw_text)
-    print(clean_text)
-    #    p = multiprocessing.Pool(multiprocessing.cpu_count())
+
     #    single_set_p = p.map(count_s_occurrences, raw_text)
     #    dual_set_p = p.map(count_d_occurrences, raw_text)
     #    tri_set_p = p.map(count_t_occurrences, raw_text)
@@ -77,9 +75,9 @@ def text_analysis():
     #   print(dual_set_p)
     #   print(tri_set_p)
 
-    single_set_list = dict(count_s_occurrences(clean_text))
-    dual_set_list = dict(count_d_occurrences(clean_text))
-    tri_set_list = dict(count_t_occurrences(clean_text))
+    single_set_list = dict(count_occurrences(raw_text, 1))
+    dual_set_list = dict(count_occurrences(raw_text, 2))
+    tri_set_list = dict(count_occurrences(raw_text, 3))
 
     # p = multiprocessing.Pool(multiprocessing.cpu_count())
     # result = p.map(get_entropy, [single_set_dict, dual_set_dict, tri_set_dict])
