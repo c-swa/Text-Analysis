@@ -19,6 +19,7 @@ def filter_characters(str_list):
             return True
 
 
+# Counts total number of times each single character is occurring in the text
 def count_s_occurrences(str_list):
     char_dict = {}
     for ch in str_list:
@@ -28,7 +29,20 @@ def count_s_occurrences(str_list):
     return char_dict
 
 
-def sum(ch_dict):
+# Calculates the total entropy of the single character set
+def get_s_entropy(str_dict):
+    total = sum_text(str_dict)
+    summation = 0
+    for ch in str_dict.keys():
+        n_c = str_dict[ch]
+        p_c = n_c / total
+        equation = n_c * (-1) * (p_c) * log2(p_c)
+        summation += equation
+
+    return summation
+
+
+def sum_text(ch_dict):
     total = 0
     for key in ch_dict.keys():
         total += ch_dict[key]
@@ -39,11 +53,11 @@ def text_analysis():
     # Pulls the raw text from file and places it in an array
     raw_text = str(open(FILENAME, 'r').read())
 
-    processed_single_char_text = dict(count_s_occurrences(raw_text))
-    output_str = str(processed_single_char_text)
+    output = dict(count_s_occurrences(raw_text))
 
-    print("Test of count_occurrences: " + output_str)
-    print(sum(processed_single_char_text))
+    print(str(get_s_entropy(output)))
+    # Returns the dictionary of characters, and their count of occurrences
+    return output
 
 
 text_analysis()
