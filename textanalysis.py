@@ -16,17 +16,17 @@ ALLOWED_CHARACTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'
 
 
 def filter_characters(string):
-    return filter(lambda ch: ch in ALLOWED_CHARACTERS, string)
+    return str(filter(lambda ch: ch in ALLOWED_CHARACTERS, string))
 
 
 # Counts total number of times each single character is occurring in the text
 def count_s_occurrences(string):
     char_dict = {}
-    for ch in string:
-        char_dict.setdefault(ch, 0)
-        char_dict[ch] += 1
-        
-    return char_dict
+    length = 1
+    chunks = list(string)
+    char_dict = {**map(lambda ch: (ch,0), chunks)}
+    values = {**map(lambda key: (key,chunks.count(key)),char_dict.keys())}
+    return values
 
 
 # Calculates the total entropy of the character dictionary (where the keys are single characters)
@@ -63,7 +63,8 @@ def count_t_occurrences(string):
 def text_analysis():
     # Pulls the raw text from file and places it in an array
     raw_text = str(open(FILENAME, 'r').read())
-
+    clean_text = filter_characters(raw_text)
+    print(clean_text)
     #    p = multiprocessing.Pool(multiprocessing.cpu_count())
     #    single_set_p = p.map(count_s_occurrences, raw_text)
     #    dual_set_p = p.map(count_d_occurrences, raw_text)
@@ -76,23 +77,22 @@ def text_analysis():
     #   print(dual_set_p)
     #   print(tri_set_p)
 
-    single_set_dict = dict(count_s_occurrences(raw_text))
-    dual_set_dict = dict(count_d_occurrences(raw_text))
-    tri_set_dict = dict(count_t_occurrences(raw_text))
+    single_set_list = dict(count_s_occurrences(clean_text))
+    dual_set_list = dict(count_d_occurrences(clean_text))
+    tri_set_list = dict(count_t_occurrences(clean_text))
 
-    print(single_set_dict)
     # p = multiprocessing.Pool(multiprocessing.cpu_count())
     # result = p.map(get_entropy, [single_set_dict, dual_set_dict, tri_set_dict])
     # p.close()
     # p.join()
 
-    entropy_list = [get_entropy(single_set_dict), get_entropy(dual_set_dict), get_entropy(tri_set_dict)]
+    entropy_list = [get_entropy(single_set_list), get_entropy(dual_set_list), get_entropy(tri_set_list)]
     # return result
     return entropy_list
 
 
-start_time = time.process_time_ns()
+start_time = time.process_time()
 print(str(text_analysis()))
-fin_time = time.process_time_ns()
+fin_time = time.process_time()
 
 print("Time (f - s): " + str(fin_time - start_time))
