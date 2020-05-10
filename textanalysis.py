@@ -13,51 +13,74 @@ ALLOWED_CHARACTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l'
                       ]
 
 
-def filter_characters(str_list):
-    for ch in str_list:
+def filter_characters(string):
+    for ch in string:
         if ch in ALLOWED_CHARACTERS:
             return True
 
 
 # Counts total number of times each single character is occurring in the text
-def count_s_occurrences(str_list):
+def count_s_occurrences(string):
     char_dict = {}
-    for ch in str_list:
+    for ch in string:
         char_dict.setdefault(ch, 0)
         char_dict[ch] += 1
 
     return char_dict
 
 
-# Calculates the total entropy of the single character set
-def get_s_entropy(str_dict):
-    total = sum_text(str_dict)
+# Calculates the total entropy of the character dictionary (where the keys are single characters)
+def get_entropy(str_dict):
+    total = sum_dict(str_dict)
     summation = 0
     for ch in str_dict.keys():
         n_c = str_dict[ch]
         p_c = n_c / total
-        equation = n_c * (-1) * (p_c) * log2(p_c)
+        equation = n_c * (-1) * p_c * log2(p_c)
         summation += equation
 
     return summation
 
 
-def sum_text(ch_dict):
-    total = 0
+# Counts the total number of pairs of characters that occur in the passed string
+def count_d_occurrences(string):
+    dual_dict = {}
+    for index in range(1, int((len(string) / 2) - 1)):
+        dual_dict.setdefault(string[(index - 1): index + 1], 0)
+        dual_dict[string[(index - 1): index + 1]] += 1
+
+    return dual_dict
+
+
+# Counts the total number of triplets of characters that occur in the passed string
+def count_t_occurrences(string):
+    tri_dict = {}
+    for index in range (1, int((len(string) / 3) - 2)):
+        tri_dict.setdefault(string[index-1:index+2], 0)
+        tri_dict[string[index - 1:index+2]] += 1
+
+    return tri_dict
+
+
+# Calculates the sum of values of a dictionary
+def sum_dict(ch_dict):
+    summation = 0
     for key in ch_dict.keys():
-        total += ch_dict[key]
-    return total
+        summation += ch_dict[key]
+    return summation
 
 
+# Performs a textual analysis of a given .txt file - FILENAME at the top of the script
 def text_analysis():
     # Pulls the raw text from file and places it in an array
     raw_text = str(open(FILENAME, 'r').read())
 
-    output = dict(count_s_occurrences(raw_text))
+    single_set_dict = dict(count_s_occurrences(raw_text))
+    dual_set_dict = dict(count_d_occurrences(raw_text))
+    tri_set_dict = dict(count_t_occurrences(raw_text))
 
-    print(str(get_s_entropy(output)))
-    # Returns the dictionary of characters, and their count of occurrences
-    return output
+    entropy_list = [get_entropy(single_set_dict),get_entropy(dual_set_dict),get_entropy(tri_set_dict)]
+    return entropy_list
 
 
-text_analysis()
+print(str(text_analysis()))
