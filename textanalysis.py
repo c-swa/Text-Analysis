@@ -19,11 +19,12 @@ def filter_characters(string):
 
 
 # Counts total number of times each single character is occurring in the text
-def count_occurrences(string: str, chunker: int = 1) -> dict:
-    n_chunks = len(string)
-    chunks = list(map(lambda i: string[chunker * i:chunker * i + chunker], range(n_chunks)))
+def count_occurrences(string: str, chunker: int) -> dict:
+    p = multiprocessing.dummy.Pool(64)
+    n_chunks = len(string)//chunker
+    chunks = list(p.map(lambda i: string[chunker * i:chunker * i + chunker], range(n_chunks)))
     print(chunks)
-    values = dict(list(map((lambda key: (key, chunks.count(key))), set(chunks))))
+    values = dict(list(p.map((lambda key: (key, chunks.count(key))), set(chunks))))
     print(values)
     return values
 
@@ -40,9 +41,7 @@ def text_analysis():
     # Pulls the raw text from file and places it in an array
     raw_text = str(open(FILENAME, 'r').read())
 
-    p = multiprocessing.dummy.Pool(4)
-
-    single_set_list = dict(tuple(*p.map(count_occurrences, raw_text)))
+    single_set_list = dict(count_occurrences(raw_text, 1))
     dual_set_list = dict(count_occurrences(raw_text, 2))
     tri_set_list = dict(count_occurrences(raw_text, 3))
 
