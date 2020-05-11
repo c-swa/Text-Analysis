@@ -3,8 +3,7 @@
 # View ReadMe for more project information
 import time
 from functools import reduce
-import multiprocessing
-import timeit
+import multiprocessing.dummy
 from math import log2
 
 FILENAME = "WarAndPeace.txt"
@@ -21,8 +20,8 @@ def filter_characters(string):
 
 # Counts total number of times each single character is occurring in the text
 def count_occurrences(string: str, chunker: int = 1) -> dict:
-    n_chunks = len(string) # chunker
-    chunks = list(map(lambda i: string[chunker * i:][:chunker], range(n_chunks)))
+    n_chunks = len(string)
+    chunks = list(map(lambda i: string[chunker * i:chunker * i + chunker], range(n_chunks)))
     print(chunks)
     values = dict(list(map((lambda key: (key, chunks.count(key))), set(chunks))))
     print(values)
@@ -36,53 +35,16 @@ def get_entropy(str_dict):
                   map(lambda n_c: n_c * (-1) * (n_c / total) * log2(n_c / total), str_dict.values()))
 
 
-# Counts the total number of pairs of characters that occur in the passed string
-def count_d_occurrences(string):
-    dual_dict = {}
-    # dual_dict = map(lambda n: dual_dict.setdefault(string[(n - 1):(n + 1), 0]), range(1, int(len(string) / 2) - 1))
-
-    # return dual_dict
-    for index in range(1, int((len(string) / 2) - 1)):
-        dual_dict.setdefault(string[(index - 1): index + 1], 0)
-        dual_dict[string[(index - 1): index + 1]] += 1
-
-    return dual_dict
-
-
-# Counts the total number of triplets of characters that occur in the passed string
-def count_t_occurrences(string):
-    tri_dict = {}
-    for index in range(1, int((len(string) / 3) - 2)):
-        tri_dict.setdefault(string[index - 1:index + 2], 0)
-        tri_dict[string[index - 1:index + 2]] += 1
-
-    return tri_dict
-
-
 # Performs a textual analysis of a given .txt file - FILENAME at the top of the script
 def text_analysis():
     # Pulls the raw text from file and places it in an array
     raw_text = str(open(FILENAME, 'r').read())
 
-    #    single_set_p = p.map(count_s_occurrences, raw_text)
-    #    dual_set_p = p.map(count_d_occurrences, raw_text)
-    #    tri_set_p = p.map(count_t_occurrences, raw_text)
+    p = multiprocessing.dummy.Pool(4)
 
-    #    p.close()
-    #    p.join()
-
-    #   print(single_set_p)
-    #   print(dual_set_p)
-    #   print(tri_set_p)
-
-    single_set_list = dict(count_occurrences(raw_text, 1))
+    single_set_list = dict(tuple(*p.map(count_occurrences, raw_text)))
     dual_set_list = dict(count_occurrences(raw_text, 2))
     tri_set_list = dict(count_occurrences(raw_text, 3))
-
-    # p = multiprocessing.Pool(multiprocessing.cpu_count())
-    # result = p.map(get_entropy, [single_set_dict, dual_set_dict, tri_set_dict])
-    # p.close()
-    # p.join()
 
     entropy_list = [get_entropy(single_set_list), get_entropy(dual_set_list), get_entropy(tri_set_list)]
     # return result
